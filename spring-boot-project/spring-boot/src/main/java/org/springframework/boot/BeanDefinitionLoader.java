@@ -156,6 +156,7 @@ class BeanDefinitionLoader {
 			load(loader);
 		}
 		if (isComponent(source)) {
+			//AnnotatedBeanDefinitionReader
 			this.annotatedReader.register(source);
 			return 1;
 		}

@@ -301,7 +301,9 @@ public class SpringApplication {
 		ConfigurableApplicationContext context = null;
 		Collection<SpringBootExceptionReporter> exceptionReporters = new ArrayList<>();
 		configureHeadlessProperty();
+		//EventPublishingRunListener
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		//发送一个"ApplicationStartingEvent"事件
 		listeners.starting();
 		try {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(
@@ -309,7 +311,10 @@ public class SpringApplication {
 			ConfigurableEnvironment environment = prepareEnvironment(listeners,
 					applicationArguments);
 			configureIgnoreBeanInfo(environment);
+			//打印banner
 			Banner printedBanner = printBanner(environment);
+			//创建上下文
+			//Web环境中是 AnnotationConfigEmbeddedWebApplicationContext
 			context = createApplicationContext();
 			exceptionReporters = getSpringFactoriesInstances(
 					SpringBootExceptionReporter.class,
@@ -345,8 +350,11 @@ public class SpringApplication {
 			SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments) {
 		// Create and configure the environment
+		//StandardServletEnvironment
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+		//配置环境
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
+		//发送"ApplicationEnvironmentPreparedEvent"事件
 		listeners.environmentPrepared(environment);
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
@@ -373,6 +381,7 @@ public class SpringApplication {
 			ApplicationArguments applicationArguments, Banner printedBanner) {
 		context.setEnvironment(environment);
 		postProcessApplicationContext(context);
+		//调用各个初始化器的initialize方法
 		applyInitializers(context);
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
@@ -381,6 +390,7 @@ public class SpringApplication {
 		}
 		// Add boot specific singleton beans
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+		//DefaultAppli
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
 		if (printedBanner != null) {
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
@@ -433,6 +443,13 @@ public class SpringApplication {
 		// Use names and ensure unique to protect against duplicates
 		Set<String> names = new LinkedHashSet<>(
 				SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+		//ConfigurationWarningsApplicationContextInitializer
+		//ContextIdApplicationContextInitializer
+		//DelegatingApplicationContextInitializer
+		//ServerPortInfoApplicationContextInitializer
+		//SharedMetadataReaderFactoryContextInitializer
+		//AutoConfigurationReportLoggingInitializer
+
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes,
 				classLoader, args, names);
 		AnnotationAwareOrderComparator.sort(instances);
